@@ -1,0 +1,218 @@
+[
+  {
+    "id": "coat-01",
+    "category": "outerwear",
+    "name": {
+      "ru": "Пальто «Тихая сила»",
+      "en": "Quiet Strength Coat",
+      "kg": "«Жумшак күч» пальтосу",
+      "kz": "«Тыныш күш» пальтосы"
+    },
+    "description": {
+      "ru": "Объёмное пальто с мягкой линией плеча и поясом из итальянской шерсти. Продуманный силуэт для прохладных городских дней.",
+      "en": "An oversized coat with a soft shoulder line and a self-tie belt, cut from Italian wool. A thoughtful silhouette for crisp city days.",
+      "kg": "Италия жүнүнөн тигилген, ийини жумшак жана куру бар кенен пальто. Шаардын салкын күндөрүнө ылайыктуу силуэт.",
+      "kz": "Италиялық жүннен тігілген, иығы жұмсақ әрі белдігі бар кең пальто. Қаланың салқын күндеріне арналған пішін."
+    },
+    "price": 24800,
+    "image": "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=900&q=82",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "badge": "sale",
+    "rating": 4.9,
+    "reviews_count": 12
+  },
+  {
+    "id": "suit-02",
+    "category": "suits",
+    "name": {
+      "ru": "Костюм «Новый ритм»",
+      "en": "New Rhythm Suit",
+      "kg": "«Жаңы ыргак» костюму",
+      "kz": "«Жаңа ырғақ» костюмі"
+    },
+    "description": {
+      "ru": "Свободный двубортный жакет и прямые брюки из дышащей смесовой ткани. Одинаково выразителен вместе и по отдельности.",
+      "en": "An easy double-breasted blazer and straight-leg trousers in breathable blended fabric. A considered set, equally expressive worn together or apart.",
+      "kg": "Дем алуучу кездемеден тигилген кенен жакет жана түз шым. Өз-өзүнчө да, чогуу да жарашыктуу.",
+      "kz": "Ауа өткізетін матадан тігілген кең жакет пен тік шалбар. Жеке де, бірге де жарасымды."
+    },
+    "price": 21900,
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=900&q=82",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "badge": "new",
+    "rating": 4.8,
+    "reviews_count": 8
+  },
+  {
+    "id": "knit-03",
+    "category": "knitwear",
+    "name": {
+      "ru": "Свитер «Первый снег»",
+      "en": "First Snow Sweater",
+      "kg": "«Алгачкы кар» свитери",
+      "kz": "«Алғашқы қар» жемпірі"
+    },
+    "description": {
+      "ru": "Мягкий объёмный свитер из натурального кашемира и шерсти мериноса. Нежная фактура и спущенное плечо для повседневных ритуалов.",
+      "en": "A softly oversized knit in natural cashmere and merino wool. A gentle texture and dropped shoulder, made for everyday rituals.",
+      "kg": "Табигый кашемир менен меринос жүнүнөн жумшак кенен свитер. Жагымдуу фактурасы жана түшүрүлгөн ийини бар.",
+      "kz": "Табиғи кашемир мен меринос жүнінен тоқылған жұмсақ кең жемпір. Жағымды текстурасы мен түсірілген иығы бар."
+    },
+    "price": 13900,
+    "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=900&q=82",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "badge": "",
+    "rating": 4.9,
+    "reviews_count": 16
+  },
+  {
+    "id": "coat-04",
+    "category": "outerwear",
+    "name": {
+      "ru": "Тренч «Между строк»",
+      "en": "Between the Lines Trench",
+      "kg": "«Саптардын арасында» тренчи",
+      "kz": "«Жолдар арасында» тренчі"
+    },
+    "description": {
+      "ru": "Лёгкий тренч из хлопка с водоотталкивающей отделкой. Съёмный пояс, глубокие карманы и подкладка с авторским принтом.",
+      "en": "A lightweight cotton trench with a water-resistant finish. A removable belt, deep pockets and a custom printed lining.",
+      "kg": "Суу өткөрбөс иштетүүсү бар жеңил пахта тренчи. Алынуучу кур, терең чөнтөктөр жана автордук астар.",
+      "kz": "Су өткізбейтін өңдеуі бар жеңіл мақта тренчі. Алынбалы белдік, терең қалталар мен авторлық астар."
+    },
+    "price": 19200,
+    "image": "https://images.unsplash.com/photo-1548126032-079a0fb0099d?auto=format&fit=crop&w=900&q=82",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "badge": "",
+    "rating": 4.7,
+    "reviews_count": 6
+  },
+  {
+    "id": "suit-05",
+    "category": "suits",
+    "name": {
+      "ru": "Жилет «Своя линия»",
+      "en": "Own Line Waistcoat",
+      "kg": "«Өз сызыгың» жилети",
+      "kz": "«Өз сызығың» жилеті"
+    },
+    "description": {
+      "ru": "Структурный жилет из фактурной ткани, вдохновлённый мужским портновским искусством. Носите самостоятельно или поверх рубашки.",
+      "en": "A structured waistcoat in tactile fabric, inspired by traditional tailoring. Wear it on its own or layered over a shirt.",
+      "kg": "Эркектердин классикалык тигүү өнөрүнөн шыктанган фактуралуу жилет. Өзүнчө же көйнөктүн үстүнөн кийиңиз.",
+      "kz": "Классикалық ерлер тігін өнерінен шабыт алған текстуралы жилет. Жеке немесе жейденің үстінен киіңіз."
+    },
+    "price": 11600,
+    "image": "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?auto=format&fit=crop&w=900&q=82",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "badge": "new",
+    "rating": 4.8,
+    "reviews_count": 9
+  },
+  {
+    "id": "knit-06",
+    "category": "knitwear",
+    "name": {
+      "ru": "Кардиган «Тёплый воздух»",
+      "en": "Warm Air Cardigan",
+      "kg": "«Жылуу аба» кардиганы",
+      "kz": "«Жылы ауа» кардиганы"
+    },
+    "description": {
+      "ru": "Удлинённый кардиган из мягкой мериносовой шерсти с перламутровыми пуговицами. Тёплый слой, который хочется носить каждый день.",
+      "en": "An elongated cardigan in soft merino wool with mother-of-pearl buttons. The kind of warm layer you reach for every day.",
+      "kg": "Жумшак меринос жүнүнөн тигилген, бермет топчулары бар узун кардиган. Күн сайын кийгиңиз келген жылуу катмар.",
+      "kz": "Жұмсақ меринос жүнінен тігілген, інжу түймелері бар ұзын кардиган. Күнде кигіңіз келетін жылы қабат."
+    },
+    "price": 15400,
+    "image": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=900&q=82",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "badge": "",
+    "rating": 4.9,
+    "reviews_count": 11
+  },
+  {
+    "id": "coat-07",
+    "category": "outerwear",
+    "name": {
+      "ru": "Куртка «Тихий вечер»",
+      "en": "Quiet Evening Jacket",
+      "kg": "«Тынч кеч» курткасы",
+      "kz": "«Тыныш кеш» күртесі"
+    },
+    "description": {
+      "ru": "Укороченная куртка с мягкой стёганой фактурой и высоким воротником. Лёгкий утеплитель и матовая фурнитура.",
+      "en": "A cropped jacket with soft quilting and a high collar. Light insulation and understated matte hardware.",
+      "kg": "Жумшак тигиштүү фактурасы жана бийик жакасы бар кыска куртка. Жеңил жылуулоочу катмар жана күңүрт фурнитура.",
+      "kz": "Жұмсақ тігісті фактурасы мен биік жағасы бар қысқа күрте. Жеңіл жылытқыш қабаты мен күңгірт фурнитура."
+    },
+    "price": 17800,
+    "image": "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=70",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "badge": "",
+    "rating": 4.8,
+    "reviews_count": 5
+  },
+  {
+    "id": "knit-08",
+    "category": "knitwear",
+    "name": {
+      "ru": "Топ «Вторая кожа»",
+      "en": "Second Skin Top",
+      "kg": "«Экинчи тери» топу",
+      "kz": "«Екінші тері» топы"
+    },
+    "description": {
+      "ru": "Лаконичный топ из тонкого хлопкового трикотажа с деликатной отделкой. Мягкая основа для многослойных образов.",
+      "en": "A clean-lined top in fine cotton knit with delicate finishing. A soft foundation for layered looks.",
+      "kg": "Назик жасалгалуу жука пахта трикотажынан тигилген жөнөкөй топ. Катмарлап кийүүгө ыңгайлуу.",
+      "kz": "Нәзік әрленген жұқа мақта трикотажынан тігілген қарапайым топ. Қабаттап киюге ыңғайлы."
+    },
+    "price": 7800,
+    "image": "https://images.unsplash.com/photo-1551163943-3f6a855d1153?auto=format&fit=crop&w=900&q=82",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "badge": "",
+    "rating": 4.6,
+    "reviews_count": 4
+  }
+]

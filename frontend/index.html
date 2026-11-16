@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11110f">
+  <meta name="description" content="VELVET & VOID — одежда для тех, кто выбирает себя. Эксклюзивные коллекции и ателье в Бишкеке.">
+  <title>VELVET & VOID — Wear your own world</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="announcement"><span data-i18n="announcement">Новая коллекция · Осень / Зима 2025</span><span class="announcement-dot">✦</span><span data-i18n="announcementRight">Бесплатная доставка от 20 000 сом</span></div>
+  <header class="site-header">
+    <button class="icon-button mobile-menu-button" id="menuToggle" aria-label="Открыть меню" aria-expanded="false"><span></span><span></span></button>
+    <a class="wordmark" href="#" aria-label="VELVET & VOID — главная">VELVET <i>&</i> VOID<span class="wordmark-sub">BISHKEK · EST. 2025</span></a>
+    <nav class="main-nav" id="mainNav" aria-label="Основная навигация">
+      <a href="#collection" data-i18n="navCollection">Коллекция</a>
+      <a href="#story" data-i18n="navStory">Философия</a>
+      <a href="#reviews" data-i18n="navReviews">Отзывы</a>
+      <a href="#faq" data-i18n="navFaq">Вопросы</a>
+      <a href="#atelier" data-i18n="navAtelier">Ателье</a>
+    </nav>
+    <div class="header-actions">
+      <label class="language-picker"><span class="sr-only" data-i18n="language">Язык</span><select id="languageSelect" aria-label="Язык"><option value="ru">RU</option><option value="kg">KG</option><option value="en">EN</option><option value="kz">KZ</option></select></label>
+      <button class="icon-button theme-toggle" id="themeToggle" aria-label="Переключить тему" title="Переключить тему"><span id="themeIcon">☼</span></button>
+      <button class="icon-button account-trigger" id="accountOpen" aria-label="Аккаунт" title="Аккаунт">♙</button>
+      <button class="icon-button wishlist-trigger" id="wishlistToggle" aria-label="Избранное" title="Избранное">♡<span class="count-badge" id="wishlistCount">0</span></button>
+      <button class="icon-button cart-trigger" id="cartOpen" aria-label="Корзина" title="Корзина">♧<span class="count-badge" id="cartCount">0</span></button>
+    </div>
+  </header>
+  <div class="app-status hidden" id="appStatus" role="status" aria-live="polite"></div>
+
+  <main>
+    <section class="hero" aria-label="Главная">
+      <div class="hero-image"></div>
+      <div class="hero-content">
+        <p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="heroEyebrow">НОВАЯ ГЛАВА · 01 / 25</span></p>
+        <h1 data-i18n="heroTitle">Одежда,<br>которая <em>чувствует.</em></h1>
+        <p class="hero-copy" data-i18n="heroCopy">Для тихой силы. Для смелых пауз.<br>Для тех, кто выбирает свой собственный мир.</p>
+        <a class="button button-gold" href="#collection"><span data-i18n="exploreCollection">Открыть коллекцию</span><span>↗</span></a>
+      </div>
+      <div class="hero-index"><span>01</span><i></i><span>04</span></div>
+      <div class="hero-caption">BISHKEK, KYRGYZSTAN · 42°52′ N 74°36′ E</div>
+    </section>
+
+    <section class="ticker" aria-label="Об бренде"><div class="ticker-track"><span>MADE TO BE FELT</span><b>✳</b><span>NOT MADE TO BLEND IN</span><b>✳</b><span>MADE TO BE FELT</span><b>✳</b><span>NOT MADE TO BLEND IN</span><b>✳</b></div></section>
+
+    <section class="collection section-wrap" id="collection">
+      <div class="section-heading">
+        <div><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="collectionEyebrow">СЕЗОННАЯ ПОДБОРКА · 2025</span></p><h2 data-i18n="collectionTitle">Носить <em>чувства.</em></h2></div>
+        <p class="section-note" data-i18n="collectionNote">Вещи с характером. Созданы медленно,<br>чтобы оставаться с вами надолго.</p>
+      </div>
+      <div class="catalog-toolbar">
+        <div class="category-tabs" id="categoryTabs" role="group" aria-label="Категории">
+          <button class="category-tab active" data-category="all" data-i18n="allProducts">Все изделия</button>
+          <button class="category-tab" data-category="outerwear" data-i18n="outerwear">Верхняя одежда</button>
+          <button class="category-tab" data-category="suits" data-i18n="suits">Костюмы</button>
+          <button class="category-tab" data-category="knitwear" data-i18n="knitwear">Трикотаж</button>
+        </div>
+        <div class="catalog-tools">
+          <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Поиск по коллекции" data-i18n-placeholder="searchPlaceholder" autocomplete="off"><button id="clearSearch" class="clear-search" aria-label="Очистить поиск">×</button></label>
+          <label class="sort-control"><span data-i18n="sort">Сортировка</span><select id="sortSelect" aria-label="Сортировка"><option value="newest" data-i18n="sortNewest">Сначала новинки</option><option value="price-low" data-i18n="sortPriceLow">Сначала дешевле</option><option value="price-high" data-i18n="sortPriceHigh">Сначала дороже</option><option value="popular" data-i18n="sortPopular">Сначала популярные</option></select></label>
+          <button class="filter-toggle" id="filterToggle" aria-label="Только избранное">♡ <span data-i18n="favoritesOnly">Избранное</span></button>
+        </div>
+      </div>
+      <div class="active-filters hidden" id="activeFilters" aria-live="polite"></div>
+      <div class="catalog-status"><span id="resultsLabel"></span><span id="activeFilterLabel"></span></div>
+      <div class="product-grid" id="productGrid" aria-live="polite"></div>
+      <button class="button catalog-load-more hidden" id="loadMoreProducts" type="button">Загрузить ещё</button>
+      <div class="empty-state hidden" id="emptyState"><span>✳</span><p data-i18n="emptyCatalog">Ничего не найдено. Попробуйте изменить запрос.</p><button class="text-button" id="resetCatalog" data-i18n="resetFilters">Сбросить фильтры</button></div>
+      <div class="collection-bottom"><span data-i18n="craftedNote">СОЗДАНО В БИШКЕКЕ · ВЫПУСК ОГРАНИЧЕН</span><span>✳</span></div>
+    </section>
+
+    <section class="manifesto" id="story">
+      <div class="manifesto-image" role="img" aria-label="Ткань и детали изделия"></div>
+      <div class="manifesto-copy">
+        <p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="manifestoEyebrow">НАША ФИЛОСОФИЯ</span></p>
+        <h2 data-i18n="manifestoTitle">Меньше вещей.<br><em>Больше себя.</em></h2>
+        <p data-i18n="manifestoText">Мы верим в одежду, у которой есть свой ритм. В тактильные ткани, честные силуэты и детали, которые открываются не сразу. Каждая вещь создана в Бишкеке небольшими тиражами — с уважением к ремеслу и к тому, кто её носит.</p>
+        <a href="#atelier" class="text-link"><span data-i18n="meetAtelier">Познакомиться с ателье</span><span>↗</span></a>
+        <div class="manifesto-signature">V<span>&</span>V</div>
+      </div>
+    </section>
+
+    <section class="values-section section-wrap" aria-labelledby="valuesTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="valuesEyebrow">НАШ ПОДХОД</span></p><h2 id="valuesTitle" data-i18n="valuesTitle">Продумано.<br><em>Сделано с чувством.</em></h2></div>
+        <p class="section-note" data-i18n="valuesNote">Не гнаться за количеством.<br>Выбирать то, что останется с вами.</p>
+      </div>
+      <div class="values-grid">
+        <article class="value-card"><span class="value-number">01</span><span class="value-icon" aria-hidden="true">⌖</span><h3 data-i18n="valueLocalTitle">Создано в Бишкеке</h3><p data-i18n="valueLocalText">Работаем рядом с вами и бережно относимся к ремеслу, деталям и людям, которые создают наши вещи.</p></article>
+        <article class="value-card"><span class="value-number">02</span><span class="value-icon" aria-hidden="true">✳</span><h3 data-i18n="valueSmallTitle">Небольшие тиражи</h3><p data-i18n="valueSmallText">Выпускаем коллекции ограниченными партиями — чтобы выбирать осознанно и носить дольше.</p></article>
+        <article class="value-card"><span class="value-number">03</span><span class="value-icon" aria-hidden="true">◌</span><h3 data-i18n="valueAtelierTitle">Внимание к посадке</h3><p data-i18n="valueAtelierText">В ателье можно примерить вещи, посмотреть на ткани и подобрать силуэт в спокойной обстановке.</p></article>
+      </div>
+    </section>
+
+    <section class="reviews-section section-wrap" id="reviews" aria-labelledby="reviewsTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="reviewsEyebrow">ВАШИ ВПЕЧАТЛЕНИЯ</span></p><h2 id="reviewsTitle" data-i18n="reviewsTitle">Истории,<br><em>которые остаются.</em></h2></div>
+        <p class="section-note" data-i18n="reviewsNote">Честные отзывы покупателей,<br>оставленные на страницах изделий.</p>
+      </div>
+      <div class="reviews-grid" id="customerReviews" aria-live="polite"></div>
+    </section>
+
+    <section class="faq-section section-wrap" id="faq" aria-labelledby="faqTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="faqEyebrow">ПОЛЕЗНО ЗНАТЬ</span></p><h2 id="faqTitle" data-i18n="faqTitle">Перед тем,<br><em>как выбрать.</em></h2></div>
+        <p class="section-note" data-i18n="faqNote">Коротко ответили на вопросы,<br>которые помогают сделать выбор.</p>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item"><summary data-i18n="faqSizeQuestion">Как подобрать размер?</summary><p data-i18n="faqSizeAnswer">Откройте карточку изделия и загляните в размерный гид. Там указаны ориентировочные мерки груди, талии и бёдер. Если сомневаетесь, запишитесь на примерку в ателье.</p></details>
+        <details class="faq-item"><summary data-i18n="faqDeliveryQuestion">Как получить заказ?</summary><p data-i18n="faqDeliveryAnswer">Для заказов доступны курьерская доставка по Бишкеку за 300 сом и бесплатный самовывоз из ателье. Выберите удобный вариант при оформлении.</p></details>
+        <details class="faq-item"><summary data-i18n="faqAtelierQuestion">Можно ли сначала примерить вещь?</summary><p data-i18n="faqAtelierAnswer">Да. Запишитесь на визит через форму на сайте: ателье находится по адресу ул. Токтогула, 125 и открыто со вторника по воскресенье, с 11:00 до 20:00.</p></details>
+        <details class="faq-item"><summary data-i18n="faqReviewQuestion">Как оставить отзыв?</summary><p data-i18n="faqReviewAnswer">Откройте карточку изделия, выберите оценку, напишите впечатление и нажмите «Опубликовать отзыв». Отзывы появятся в этом разделе.</p></details>
+      </div>
+    </section>
+
+    <section class="atelier section-wrap" id="atelier">
+      <div class="atelier-intro"><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="atelierEyebrow">НАША ДВЕРЬ ОТКРЫТА</span></p><h2 data-i18n="atelierTitle">Встретимся<br><em>в ателье.</em></h2><p data-i18n="atelierText">Примерьте коллекцию, найдите свою посадку или просто загляните на чашку чая. Мы будем рады.</p><div class="atelier-address"><span>⌖</span><div><strong data-i18n="addressTitle">Бишкек, Кыргызстан</strong><small>ул. Токтогула, 125 · Вт–Вс, 11:00–20:00</small></div></div></div>
+      <form class="atelier-form" id="visitForm">
+        <h3 data-i18n="bookVisit">Записаться на визит</h3>
+        <label><span data-i18n="yourName">Ваше имя</span><input name="name" required minlength="2" autocomplete="name" placeholder="Алина" data-i18n-placeholder="namePlaceholder"></label>
+        <label><span data-i18n="phone">Номер телефона</span><input name="phone" required type="tel" autocomplete="tel" placeholder="+996 555 000 000"></label>
+        <div class="form-row"><label><span data-i18n="visitDate">Дата</span><input name="date" type="date" required></label><label><span data-i18n="visitTime">Время</span><select name="time" required><option value="">—</option><option>11:00</option><option>12:30</option><option>14:00</option><option>15:30</option><option>17:00</option><option>18:30</option></select></label></div>
+        <button class="button button-gold button-full" type="submit"><span data-i18n="confirmVisit">Подтвердить визит</span><span>↗</span></button>
+        <p class="form-note" data-i18n="visitNote">Мы напишем вам, чтобы подтвердить запись.</p>
+      </form>
+    </section>
+
+    <section class="newsletter">
+      <div><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="newsletterEyebrow">ПИСЬМА ИЗ НАШЕГО МИРА</span></p><h2 data-i18n="newsletterTitle">Тихие новости.<br><em>Никакого шума.</em></h2></div>
+      <form class="newsletter-form" id="newsletterForm"><label for="newsletterEmail" data-i18n="newsletterLabel">Редкие письма о новых историях и специальных выпусках.</label><div class="newsletter-input"><input id="newsletterEmail" name="email" type="email" required placeholder="Ваш email" data-i18n-placeholder="emailPlaceholder"><button type="submit" aria-label="Подписаться">↗</button></div><small data-i18n="privacyNote">Подписываясь, вы соглашаетесь получать письма от V&V. Отписаться можно в любой момент.</small></form>
+    </section>
+  </main>
+
+  <footer class="site-footer"><a class="wordmark footer-wordmark" href="#">VELVET <i>&</i> VOID<span class="wordmark-sub">BISHKEK · EST. 2025</span></a><p data-i18n="footerLine">Одежда, которая чувствует. Сделано с намерением в Бишкеке.</p><div class="footer-meta"><span>© 2025 VELVET & VOID</span><span data-i18n="footerMade">СДЕЛАНО В КЫРГЫЗСТАНЕ</span></div></footer>
+
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+  <aside class="drawer" id="cartDrawer" aria-label="Корзина" aria-hidden="true"><div class="drawer-header"><div><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="yourSelection">ВАШ ВЫБОР</span></p><h2><span data-i18n="yourCart">Корзина</span> <span id="drawerCartCount">(0)</span></h2></div><button class="close-button" data-close aria-label="Закрыть">×</button></div><div class="drawer-content" id="cartItems"></div><div class="drawer-footer" id="cartFooter"><div class="shipping-progress" role="status" aria-live="polite"><div class="shipping-progress-track" aria-hidden="true"><span id="shippingProgressBar"></span></div><p id="shippingProgressMessage"></p></div><div class="subtotal-row"><span data-i18n="subtotal">Промежуточный итог</span><strong id="cartSubtotal">0 сом</strong></div><button class="button button-gold button-full" id="checkoutOpen"><span data-i18n="checkout">Перейти к оформлению</span><span>↗</span></button></div></aside>
+  <aside class="drawer wishlist-drawer" id="wishlistDrawer" aria-label="Избранное" aria-hidden="true"><div class="drawer-header"><div><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="savedForLater">СОХРАНЕНО ДЛЯ ВАС</span></p><h2><span data-i18n="yourWishlist">Избранное</span> <span id="drawerWishlistCount">(0)</span></h2></div><button class="close-button" data-close aria-label="Закрыть">×</button></div><div class="drawer-content" id="wishlistItems"></div></aside>
+
+  <section class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-hidden="true"><button class="close-button modal-close" data-close aria-label="Закрыть">×</button><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="yourAccount">ВАШ АККАУНТ</span></p><h2 id="authTitle" data-i18n="welcomeBack">Рады видеть.</h2><p class="modal-intro" data-i18n="authIntro">Войдите, чтобы сохранить любимые вещи и историю заказов.</p><div class="auth-tabs"><button class="auth-tab active" data-auth-mode="login" data-i18n="login">Войти</button><button class="auth-tab" data-auth-mode="register" data-i18n="register">Создать аккаунт</button></div><form id="authForm"><div class="auth-name hidden"><label><span data-i18n="yourName">Ваше имя</span><input name="name" autocomplete="name"></label></div><label><span data-i18n="emailAddress">Email</span><input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label><label><span data-i18n="password">Пароль</span><input name="password" type="password" required minlength="8" autocomplete="current-password"></label><button class="button button-gold button-full" type="submit"><span id="authSubmitLabel" data-i18n="login">Войти</span><span>↗</span></button><p class="form-note" id="authHelp" data-i18n="authDemoNote">Для локального демо используйте admin@velvet.com; в опубликованной версии требуется настроенная учётная запись.</p><div class="oauth-actions hidden" id="oauthActions"><a class="button oauth-provider" data-oauth-provider="google" href="/api/auth/oauth?provider=google">Google</a><a class="button oauth-provider" data-oauth-provider="github" href="/api/auth/oauth?provider=github">GitHub</a></div></form><div class="account-session hidden" id="accountSession"></div></section>
+
+  <section class="modal wide-modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle" aria-hidden="true"><button class="close-button modal-close" data-close aria-label="Закрыть">×</button><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="secureCheckout">БЕЗОПАСНОЕ ОФОРМЛЕНИЕ</span></p><h2 id="checkoutTitle" data-i18n="checkoutTitle">Ваш заказ.</h2><div class="checkout-layout"><form id="checkoutForm"><div class="checkout-fields"><label><span data-i18n="yourName">Ваше имя</span><input name="name" required autocomplete="name"></label><label><span data-i18n="emailAddress">Email</span><input name="email" type="email" required autocomplete="email" placeholder="Ваш email" data-i18n-placeholder="emailPlaceholder"></label><label class="full-field"><span data-i18n="deliveryAddress">Адрес доставки в Кыргызстане</span><input name="address" required autocomplete="street-address" placeholder="Город, улица, дом"></label><label><span data-i18n="phone">Номер телефона</span><input name="phone" type="tel" required autocomplete="tel" placeholder="+996 555 000 000"></label><label><span data-i18n="deliveryMethod">Доставка</span><select name="delivery"><option value="courier" data-i18n="courier">Курьер Бишкек · 300 сом</option><option value="pickup" data-i18n="pickup">Самовывоз из ателье · бесплатно</option></select></label></div><h3 data-i18n="paymentMethod">Способ оплаты</h3><div class="payment-options"><label class="payment-option"><input type="radio" name="payment" value="stripe" checked><span class="payment-symbol">S</span><span><strong>Stripe</strong><small data-i18n="stripeDemo">Демо-оплата картой</small></span></label><label class="payment-option"><input type="radio" name="payment" value="mbank"><span class="payment-symbol">M</span><span><strong>MBANK / O!Деньги</strong><small data-i18n="localPayments">Кыргызстан · мобильный кошелёк</small></span></label><label class="payment-option"><input type="radio" name="payment" value="cash"><span class="payment-symbol">₸</span><span><strong data-i18n="cashTerminal">Наличные / терминал</strong><small data-i18n="cashOnDelivery">Оплата при получении</small></span></label></div><button class="button button-gold button-full" type="submit"><span data-i18n="placeOrder">Подтвердить заказ</span><span>↗</span></button><p class="form-note" data-i18n="paymentDisclaimer">Демонстрационная оплата: реальные платежи не проводятся.</p></form><div class="checkout-summary"><h3 data-i18n="orderSummary">Ваш заказ</h3><div id="checkoutItems"></div><div class="subtotal-row"><span data-i18n="subtotal">Промежуточный итог</span><strong id="checkoutSubtotal"></strong></div><div class="subtotal-row"><span data-i18n="shipping">Доставка</span><strong id="checkoutShipping"></strong></div><div class="total-row"><span data-i18n="total">Итого</span><strong id="checkoutTotal"></strong></div></div></div></section>
+
+  <section class="modal product-modal" id="productModal" role="dialog" aria-modal="true" aria-label="Описание товара" aria-hidden="true"><button class="close-button modal-close" data-close aria-label="Закрыть">×</button><div class="product-detail" id="productDetail"></div></section>
+  <section class="modal wide-modal admin-modal" id="adminModal" role="dialog" aria-modal="true" aria-labelledby="adminTitle" aria-hidden="true"><button class="close-button modal-close" data-close aria-label="Закрыть">×</button><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="adminSpace">ПАНЕЛЬ УПРАВЛЕНИЯ</span></p><h2 id="adminTitle" data-i18n="adminTitle">Пространство V&V.</h2><div class="admin-stats" id="adminStats"></div><div class="admin-chart" id="adminChart" aria-label="Статистика продаж"></div><div class="admin-layout"><div><h3 data-i18n="inventory">Каталог</h3><div class="admin-product-list" id="adminProductList"></div></div><form id="productForm"><h3 id="productFormTitle" data-i18n="addProduct">Добавить изделие</h3><label><span data-i18n="productName">Название</span><input name="name" required></label><label><span data-i18n="productDescription">Описание</span><textarea name="description" required rows="3"></textarea></label><div class="form-row"><label><span data-i18n="price">Цена (сом)</span><input name="price" type="number" min="1" required></label><label><span data-i18n="category">Категория</span><select name="category"><option value="outerwear" data-i18n="outerwear">Верхняя одежда</option><option value="suits" data-i18n="suits">Костюмы</option><option value="knitwear" data-i18n="knitwear">Трикотаж</option></select></label></div><label><span data-i18n="imageUrl">URL изображения</span><input name="image" type="url" required placeholder="https://..."></label><label class="image-upload-field hidden"><span>Или загрузите изображение</span><input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp"></label><label><span data-i18n="availableSizes">Размеры (через запятую)</span><input name="sizes" value="XS, S, M, L" required></label><label><span id="productBadgeLabel">Метка</span><select name="badge"><option value="">Без метки</option><option value="new">НОВИНКА</option><option value="sale">БЕСТСЕЛЛЕР</option></select></label><button class="button button-gold button-full" type="submit"><span id="productSubmitLabel" data-i18n="saveProduct">Сохранить изделие</span><span>↗</span></button><button class="text-button admin-cancel-edit hidden" id="cancelProductEdit" type="button">Отменить</button></form></div><section class="admin-orders"><h3 id="adminOrdersTitle">Заказы</h3><div class="admin-order-list" id="adminOrderList"></div></section><section class="admin-orders admin-visits"><h3 id="adminVisitsTitle">Записи в ателье</h3><div class="admin-order-list" id="adminVisitList"></div></section><button class="text-button admin-logout" id="adminLogout" data-i18n="logout">Выйти из аккаунта</button></section>
+
+  <section class="modal receipt-modal" id="receiptModal" role="dialog" aria-modal="true" aria-labelledby="receiptTitle" aria-hidden="true"><button class="close-button modal-close" data-close aria-label="Закрыть">×</button><div class="receipt-mark">V<span>&</span>V</div><p class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="orderConfirmed">ЗАКАЗ ПОДТВЕРЖДЁН</span></p><h2 id="receiptTitle" data-i18n="thankYou">Спасибо за выбор.</h2><p class="modal-intro" id="receiptMessage"></p><div id="receiptDetails" class="receipt-details"></div><button class="button button-gold button-full" data-close><span data-i18n="continueShopping">Продолжить покупки</span><span>↗</span></button><button class="text-button print-receipt" id="printReceipt" data-i18n="printReceipt">Распечатать чек</button></section>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <div class="loading-screen" id="loadingScreen" aria-hidden="true"><div class="loading-logo">V<span>&</span>V</div><div class="loading-line"></div><p data-i18n="loading">ОТКРЫВАЕМ ВАШ МИР</p></div>
+</body>
+</html>
