@@ -1,3 +1,3 @@
 window.VV_CONFIG = Object.freeze({
-  apiBaseUrl: "https://valvet-and-void.onrender.com",
+  apiBaseUrl: "https://velvet-and-void.onrender.com",
 });

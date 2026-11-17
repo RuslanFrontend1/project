@@ -57,7 +57,7 @@
 ### PostgreSQL и Django на Render
 
 1. Создайте PostgreSQL database в Render и скопируйте **Internal Database URL**.
-2. Создайте Web Service из этого репозитория по `render.yaml`, указав Render URL базы в переменной `DATABASE_URL`. Текущий API-адрес: `https://valvet-and-void.onrender.com`; если Render назначит другой адрес, обновите `frontend/config.js`.
+2. Создайте Web Service из этого репозитория по `render.yaml`, указав Render URL базы в переменной `DATABASE_URL`. Текущий API-адрес: `https://velvet-and-void.onrender.com`; если Render назначит другой адрес, обновите `frontend/config.js`.
 3. Добавьте `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` в переменные окружения Render, если нужны уведомления. Не добавляйте их во фронтенд.
 4. При первом запуске сервис выполнит миграции и заполнит пустой каталог командой `seed_products`.
 5. Создайте администратора командой Render Shell: `python manage.py createsuperuser`.

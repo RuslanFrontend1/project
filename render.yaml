@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: valvet-and-void
+    name: velvet-and-void
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input
@@ -18,7 +18,7 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: FRONTEND_ORIGINS
-        value: https://radiant-pika-10737e.netlify.app
+        value: https://voidless.netlify.app
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: TELEGRAM_CHAT_ID
