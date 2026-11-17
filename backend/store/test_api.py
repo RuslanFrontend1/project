@@ -1,11 +1,13 @@
 from io import StringIO
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.utils import timezone
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from config.settings import env_origins
 from .models import Booking, Order, Product, Review, Subscriber, User
 
 
@@ -22,6 +24,16 @@ class StoreApiTests(APITestCase):
             rating=0,
             reviews_count=0,
         )
+
+    def test_frontend_origins_ignore_trailing_slashes(self):
+        with patch.dict(
+            "os.environ",
+            {"FRONTEND_ORIGINS": "https://voidless.netlify.app/, https://shop.example/"},
+        ):
+            self.assertEqual(
+                env_origins("FRONTEND_ORIGINS"),
+                ["https://voidless.netlify.app", "https://shop.example"],
+            )
 
     def test_config_reports_backend_ready_without_exposing_secrets(self):
         response = self.client.get("/api/config")

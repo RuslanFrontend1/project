@@ -14,6 +14,10 @@ def env_list(name, default=""):
     return [value.strip() for value in os.getenv(name, default).split(",") if value.strip()]
 
 
+def env_origins(name, default=""):
+    return [origin.rstrip("/") for origin in env_list(name, default)]
+
+
 DEBUG = os.getenv("DEBUG", "true").lower() in {"1", "true", "yes"}
 SECRET_KEY = os.getenv("SECRET_KEY", "local-development-only-change-before-deploy")
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver")
@@ -102,7 +106,7 @@ STORAGES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-FRONTEND_ORIGINS = env_list("FRONTEND_ORIGINS")
+FRONTEND_ORIGINS = env_origins("FRONTEND_ORIGINS")
 CORS_ALLOWED_ORIGINS = FRONTEND_ORIGINS
 CSRF_TRUSTED_ORIGINS = FRONTEND_ORIGINS
 CORS_URLS_REGEX = r"^/api/.*$"
