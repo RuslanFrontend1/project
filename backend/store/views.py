@@ -1,6 +1,8 @@
+import http.client
 import json
 import logging
 import re
+import socket
 import urllib.error
 import urllib.request
 import uuid
@@ -145,33 +147,106 @@ def escape_html(value):
     )
 
 
-def notify_telegram(message):
-    token = getattr(settings, "TELEGRAM_BOT_TOKEN", "")
-    chat_id = getattr(settings, "TELEGRAM_CHAT_ID", "")
-    if not token or not chat_id:
-        return {"configured": False, "sent": False}
-    payload = json.dumps({
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True,
-    }).encode("utf-8")
+def _ipv4_create_connection(address, timeout, source_address):
+    host, port = address
+    records = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+    if not records:
+        raise OSError(f"No IPv4 address for {host}")
+    error = None
+    for family, socktype, proto, _canon, sockaddr in records:
+        sock = socket.socket(family, socktype, proto)
+        try:
+            if timeout is not None:
+                sock.settimeout(timeout)
+            if source_address:
+                sock.bind(source_address)
+            sock.connect(sockaddr)
+            return sock
+        except OSError as exc:
+            error = exc
+            sock.close()
+    raise error
+
+
+class _TelegramIPv4HTTPSConnection(http.client.HTTPSConnection):
+    def _new_conn(self):
+        return _ipv4_create_connection((self.host, self.port), self.timeout, self.source_address)
+
+
+class _TelegramIPv4HTTPSHandler(urllib.request.HTTPSHandler):
+    def https_open(self, req):
+        context = getattr(self, "_context", None)
+        check_hostname = getattr(self, "_check_hostname", None)
+        kwargs = {}
+        if context is not None:
+            kwargs["context"] = context
+        if check_hostname is not None:
+            kwargs["check_hostname"] = check_hostname
+        return self.do_open(_TelegramIPv4HTTPSConnection, req, **kwargs)
+
+
+def _plain_telegram_text(message):
+    text = re.sub(r"</?[^>]+>", "", message)
+    return (
+        text.replace("&quot;", '"')
+        .replace("&#x27;", "'")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&amp;", "&")
+    )
+
+
+def _open_telegram(request, timeout):
+    opener = urllib.request.build_opener(_TelegramIPv4HTTPSHandler)
+    return opener.open(request, timeout=timeout)
+
+
+def _send_telegram_payload(token, payload):
     request = urllib.request.Request(
         f"https://api.telegram.org/bot{token}/sendMessage",
-        data=payload,
+        data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=5) as response:
+        with _open_telegram(request, timeout=8) as response:
             result = json.loads(response.read().decode("utf-8"))
         if not result.get("ok"):
             logger.warning("Telegram notification was rejected by the API.")
-            return {"configured": True, "sent": False}
-        return {"configured": True, "sent": True}
-    except (urllib.error.URLError, TimeoutError, ValueError) as error:
-        logger.warning("Telegram notification failed: %s", type(error).__name__)
-        return {"configured": True, "sent": False}
+            return False, ""
+        return True, ""
+    except urllib.error.HTTPError as error:
+        body = error.read().decode("utf-8", "replace")
+        logger.warning("Telegram API rejected the message: HTTP %s %s", error.code, body[:300])
+        return False, body
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as error:
+        reason = getattr(error, "reason", error)
+        logger.warning(
+            "Telegram notification failed: %s",
+            reason if isinstance(reason, str) else type(reason).__name__,
+        )
+        return False, ""
+
+
+def notify_telegram(message):
+    token = getattr(settings, "TELEGRAM_BOT_TOKEN", "")
+    chat_id = str(getattr(settings, "TELEGRAM_CHAT_ID", "")).strip().strip("\"'")
+    if not token or not chat_id:
+        return {"configured": False, "sent": False}
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True,
+    }
+    sent, detail = _send_telegram_payload(token, payload)
+    if not sent and "can't parse entities" in detail:
+        sent, _detail = _send_telegram_payload(token, {
+            "chat_id": chat_id,
+            "text": _plain_telegram_text(message),
+            "disable_web_page_preview": True,
+        })
+    return {"configured": True, "sent": sent}
 
 
 def order_payload(order):
