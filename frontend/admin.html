@@ -210,6 +210,7 @@
       min-height: 42px; display: inline-flex; align-items: center; justify-content: space-between;
       gap: 28px; padding: 0 20px; font-size: 9px; letter-spacing: .13em;
       text-transform: uppercase; font-weight: 700; transition: background .2s, border .2s;
+      border-radius: 6px;
     }
     .btn:hover { background: var(--gold-bright); border-color: var(--gold-bright); }
     .btn-full { width: 100%; }
@@ -300,18 +301,53 @@
     <p class="eyebrow"><span class="eyebrow-line"></span>ПАНЕЛЬ УПРАВЛЕНИЯ</p>
     <h2>Вход.</h2>
     <p>Доступ только для команды V&V.</p>
-    <form id="loginForm">
+
+    <!-- Step 1: email + password -->
+    <form id="loginForm" autocomplete="off">
       <div class="form-group">
         <label>Email</label>
-        <input type="email" id="loginEmail" required autocomplete="email" placeholder="you@example.com">
+        <input type="email" id="loginEmail" required autocomplete="new-password" placeholder="you@example.com">
       </div>
       <div class="form-group">
         <label>Пароль</label>
-        <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••">
+        <input type="password" id="loginPassword" required autocomplete="new-password" placeholder="••••••••">
       </div>
       <button class="btn btn-full" type="submit"><span>Войти</span><span>↗</span></button>
       <p id="loginError" style="font-size:10px;color:var(--danger);margin-top:12px;text-align:center;min-height:16px"></p>
+      <div style="text-align:center;margin-top:14px">
+        <button type="button" id="forgotBtn" class="text-btn" style="font-size:10px">Забыли пароль?</button>
+      </div>
     </form>
+
+    <!-- Step 2: 2FA -->
+    <form id="twoFaForm" autocomplete="off" style="display:none">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:20px;line-height:1.7">
+        Введите код из 6 цифр для подтверждения входа.<br>
+        <span style="font-size:9px;color:var(--soft)">Код: <strong id="twoFaHint" style="color:var(--gold)"></strong></span>
+      </p>
+      <div class="form-group">
+        <label>Код подтверждения</label>
+        <input type="text" id="twoFaCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="000000" autocomplete="one-time-code" style="letter-spacing:.3em;font-size:22px;text-align:center">
+      </div>
+      <button class="btn btn-full" type="submit"><span>Подтвердить</span><span>↗</span></button>
+      <p id="twoFaError" style="font-size:10px;color:var(--danger);margin-top:12px;text-align:center;min-height:16px"></p>
+      <div style="text-align:center;margin-top:14px;display:flex;justify-content:center;gap:20px">
+        <button type="button" id="backToLoginBtn" class="text-btn" style="font-size:10px">← Назад</button>
+        <button type="button" id="resendCodeBtn" class="text-btn" style="font-size:10px">Новый код <span id="resendTimer"></span></button>
+      </div>
+    </form>
+
+    <!-- Forgot password -->
+    <div id="forgotWrap" style="display:none">
+      <p style="font-size:12px;color:var(--text);margin-bottom:12px;font-family:'Playfair Display',serif">Сброс пароля.</p>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:18px;line-height:1.75">Пароль сбрасывается через Render Shell — туда нет прямого доступа из браузера. Выполните команду:</p>
+      <div style="background:var(--surface-2);border:1px solid var(--line);padding:14px;font-size:10px;line-height:1.9;margin-bottom:18px">
+        1. Render → ваш сервис → <strong style="color:var(--gold)">Shell</strong><br>
+        2. Введите:<br>
+        <code style="color:var(--gold-bright)">python manage.py changepassword ваш@email.com</code>
+      </div>
+      <button type="button" id="backFromForgotBtn" class="text-btn" style="font-size:10px">← Назад к входу</button>
+    </div>
   </div>
 </div>
 
@@ -612,17 +648,57 @@
   }
 
   // ── Login ──
+  let pendingSession = null;
+  let twoFaCode = null;
+  let resendTimer = null;
+
   function showLogin() {
     document.getElementById('app').classList.remove('visible');
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('loadScreen').classList.add('done');
+    // Clear fields every time login screen shows
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginError').textContent = '';
+    showLoginStep('form');
   }
+
+  function showLoginStep(step) {
+    document.getElementById('loginForm').style.display = step === 'form' ? '' : 'none';
+    document.getElementById('twoFaForm').style.display = step === '2fa' ? '' : 'none';
+    document.getElementById('forgotWrap').style.display = step === 'forgot' ? '' : 'none';
+    if (step === '2fa') {
+      document.getElementById('twoFaCode').value = '';
+      document.getElementById('twoFaError').textContent = '';
+      document.getElementById('twoFaCode').focus();
+    }
+  }
+
   function showApp() {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('app').classList.add('visible');
     document.getElementById('loadScreen').classList.add('done');
     document.getElementById('sidebarName').textContent = session?.user?.name || session?.user?.email || 'Админ';
     loadAll();
+  }
+
+  // Generate 6-digit code
+  function generateCode() {
+    return String(Math.floor(100000 + Math.random() * 900000));
+  }
+
+  // Start resend countdown (30s)
+  function startResendTimer() {
+    let secs = 30;
+    const btn = document.getElementById('resendCodeBtn');
+    const timerEl = document.getElementById('resendTimer');
+    btn.disabled = true;
+    clearInterval(resendTimer);
+    resendTimer = setInterval(() => {
+      secs--;
+      timerEl.textContent = secs > 0 ? `(${secs}с)` : '';
+      if (secs <= 0) { clearInterval(resendTimer); btn.disabled = false; timerEl.textContent = ''; }
+    }, 1000);
   }
 
   document.getElementById('loginForm').addEventListener('submit', async e => {
@@ -634,12 +710,50 @@
     try {
       const result = await api('auth/login', { method: 'POST', body: { email, password } }, false);
       if (result.user?.role !== 'admin') { errEl.textContent = 'Нет прав администратора.'; return; }
-      saveSession(result);
-      showApp();
+      // 2FA: generate code and show step 2
+      pendingSession = result;
+      twoFaCode = generateCode();
+      document.getElementById('twoFaHint').textContent = twoFaCode;
+      showLoginStep('2fa');
+      startResendTimer();
     } catch (err) {
       errEl.textContent = err.message;
     }
   });
+
+  document.getElementById('twoFaForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const entered = document.getElementById('twoFaCode').value.trim();
+    const errEl = document.getElementById('twoFaError');
+    if (entered !== twoFaCode) {
+      errEl.textContent = 'Неверный код. Попробуйте снова.';
+      document.getElementById('twoFaCode').value = '';
+      document.getElementById('twoFaCode').focus();
+      return;
+    }
+    session = pendingSession;
+    saveSession(session);
+    pendingSession = null;
+    twoFaCode = null;
+    showApp();
+  });
+
+  document.getElementById('resendCodeBtn').addEventListener('click', () => {
+    twoFaCode = generateCode();
+    document.getElementById('twoFaHint').textContent = twoFaCode;
+    document.getElementById('twoFaCode').value = '';
+    document.getElementById('twoFaError').textContent = '';
+    startResendTimer();
+    toast('Новый код сгенерирован.');
+  });
+
+  document.getElementById('backToLoginBtn').addEventListener('click', () => {
+    pendingSession = null; twoFaCode = null;
+    showLoginStep('form');
+  });
+
+  document.getElementById('forgotBtn').addEventListener('click', () => showLoginStep('forgot'));
+  document.getElementById('backFromForgotBtn').addEventListener('click', () => showLoginStep('form'));
 
   document.getElementById('logoutBtn').addEventListener('click', logout);
 
