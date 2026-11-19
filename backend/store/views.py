@@ -296,6 +296,7 @@ def config(request):
             getattr(settings, "TELEGRAM_BOT_TOKEN", "")
             and getattr(settings, "TELEGRAM_CHAT_ID", "")
         ),
+        "emailConfigured": bool(getattr(settings, "EMAIL_HOST_USER", "")),
     })
 
 
@@ -781,9 +782,9 @@ def forgot_password(request):
                 recipient_list=[user.email],
                 fail_silently=False,
             )
-        except Exception:
+        except Exception as exc:
             logger.exception("Failed to send password reset email.")
-            return api_error("Could not send email. Check server email settings.")
+            return api_error(f"Не удалось отправить письмо: {exc}")
     else:
         # Dev mode: return code in response so it can be tested without SMTP
         return Response({"sent": True, "dev_code": code})

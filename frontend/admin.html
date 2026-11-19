@@ -224,7 +224,7 @@
 
     /* Toasts */
     #toasts { position: fixed; right: 22px; bottom: 22px; z-index: 100; display: grid; gap: 9px; pointer-events: none; }
-    .toast { max-width: 340px; padding: 13px 18px; background: var(--surface-2); border: 1px solid var(--line); font-size: 10px; animation: fade-up .2s ease; pointer-events: auto; }
+    .toast { max-width: 340px; padding: 13px 18px; background: var(--surface-2); border: 1px solid var(--line); font-size: 10px; animation: fade-up .2s ease; pointer-events: auto; border-radius: 4px; }
     .toast.error { border-color: var(--danger); color: var(--danger); }
     .toast.success { border-color: var(--success); color: var(--success); }
     @keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -328,7 +328,7 @@
         <label>Email аккаунта</label>
         <input type="email" id="forgotEmail" required autocomplete="new-password" placeholder="you@example.com">
       </div>
-      <button class="btn btn-full" type="submit"><span>Отправить код</span><span>↗</span></button>
+      <button class="btn btn-full" type="submit" id="forgotSubmitBtn"><span>Отправить код</span><span>↗</span></button>
       <p id="forgotError" style="font-size:10px;color:var(--danger);margin-top:12px;text-align:center;min-height:16px"></p>
       <div style="text-align:center;margin-top:14px">
         <button type="button" id="backFromForgotBtn" class="text-btn" style="font-size:10px">← Назад к входу</button>
@@ -790,18 +790,18 @@
     const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
     const errEl = document.getElementById('forgotError');
     errEl.textContent = '';
-    const btn = e.currentTarget.querySelector('button[type="submit"]');
+    const btn = document.getElementById('forgotSubmitBtn');
+    const btnSpan = btn.querySelector('span');
     btn.disabled = true;
+    btnSpan.textContent = 'Отправляем…';
     try {
       const res = await api('auth/forgot', { method: 'POST', body: { email } }, false);
       forgotEmail = email;
-      // Dev mode: backend returns code directly when EMAIL not configured
+      document.getElementById('resetEmailDisplay').textContent = email;
       if (res.dev_code) {
-        document.getElementById('resetEmailDisplay').textContent = email;
-        toast(`Режим разработки: код ${res.dev_code}`, 'success');
+        toast(`Режим разработки — код: ${res.dev_code}`, 'success');
       } else {
-        document.getElementById('resetEmailDisplay').textContent = email;
-        toast('Код отправлен на почту', 'success');
+        toast('✓ Код отправлен на ' + email, 'success');
       }
       showLoginStep('code');
       startResendTimer();
@@ -809,6 +809,7 @@
       errEl.textContent = err.message;
     } finally {
       btn.disabled = false;
+      btnSpan.textContent = 'Отправить код';
     }
   });
 
