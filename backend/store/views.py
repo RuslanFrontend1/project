@@ -1,18 +1,20 @@
 import http.client
 import json
 import logging
+import random
 import re
 import socket
 import urllib.error
 import urllib.request
 import uuid
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.db import DatabaseError, IntegrityError, connection, transaction
 from django.db.models import Avg, Count, Q, Sum
@@ -25,7 +27,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Booking, Order, Product, Review, Subscriber
+from .models import Booking, Order, PasswordResetCode, Product, Review, Subscriber
 
 
 logger = logging.getLogger(__name__)
@@ -739,3 +741,82 @@ def admin_order_detail(request, order_id):
     order.status = new_status
     order.save(update_fields=["status"])
     return Response({"id": str(order.pk), "status": order.status})
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def forgot_password(request):
+    """Send a 6-digit reset code to the user's email."""
+    email = request.data.get("email", "").strip().lower()
+    if not valid_email(email):
+        return api_error("Enter a valid email address.")
+    try:
+        user = User.objects.get(email__iexact=email, is_active=True)
+    except User.DoesNotExist:
+        # Don't reveal whether email exists
+        return Response({"sent": True})
+    if not (user.is_staff or user.is_superuser):
+        return api_error("This account does not have admin access.")
+
+    # Rate-limit: max 3 codes per 10 minutes
+    cutoff = timezone.now() - timedelta(minutes=10)
+    recent = PasswordResetCode.objects.filter(user=user, created_at__gte=cutoff).count()
+    if recent >= 3:
+        return api_error("Too many reset attempts. Please wait a few minutes.")
+
+    code = str(random.randint(100000, 999999))
+    PasswordResetCode.objects.create(user=user, code=code)
+
+    email_configured = bool(getattr(settings, "EMAIL_HOST_USER", ""))
+    if email_configured:
+        try:
+            send_mail(
+                subject="VELVET & VOID — код для входа",
+                message=(
+                    f"Ваш код подтверждения: {code}\n\n"
+                    "Код действителен 10 минут.\n"
+                    "Если вы не запрашивали вход — проигнорируйте это письмо."
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        except Exception:
+            logger.exception("Failed to send password reset email.")
+            return api_error("Could not send email. Check server email settings.")
+    else:
+        # Dev mode: return code in response so it can be tested without SMTP
+        return Response({"sent": True, "dev_code": code})
+
+    return Response({"sent": True})
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def forgot_password_verify(request):
+    """Verify the reset code and return a JWT token."""
+    email = request.data.get("email", "").strip().lower()
+    code = str(request.data.get("code", "")).strip()
+    if not valid_email(email) or not re.fullmatch(r"\d{6}", code):
+        return api_error("Invalid email or code.")
+    try:
+        user = User.objects.get(email__iexact=email, is_active=True)
+    except User.DoesNotExist:
+        return api_error("Invalid email or code.", status.HTTP_401_UNAUTHORIZED)
+
+    cutoff = timezone.now() - timedelta(minutes=10)
+    reset = (
+        PasswordResetCode.objects
+        .filter(user=user, code=code, used=False, created_at__gte=cutoff)
+        .order_by("-created_at")
+        .first()
+    )
+    if not reset:
+        return api_error("Invalid or expired code.", status.HTTP_401_UNAUTHORIZED)
+
+    reset.used = True
+    reset.save(update_fields=["used"])
+    # Invalidate all other unused codes for this user
+    PasswordResetCode.objects.filter(user=user, used=False).update(used=True)
+
+    return Response(token_payload(user))

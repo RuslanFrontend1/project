@@ -147,6 +147,19 @@ class Subscriber(models.Model):
         return self.email
 
 
+class PasswordResetCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reset_codes")
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.email} — {self.code}"
+
+
 class Review(models.Model):
     product = models.ForeignKey(
         Product,

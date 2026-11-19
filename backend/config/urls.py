@@ -19,6 +19,8 @@ urlpatterns = [
     path("api/auth/login", views.login),
     path("api/auth/refresh", views.refresh),
     path("api/auth/me", views.me),
+    path("api/auth/forgot", views.forgot_password),
+    path("api/auth/forgot/verify", views.forgot_password_verify),
     path("api/admin/stats", views.admin_stats),
     path("api/admin/orders", views.admin_orders),
     path("api/admin/orders/<uuid:order_id>", views.admin_order_detail),

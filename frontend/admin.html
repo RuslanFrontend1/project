@@ -299,8 +299,8 @@
   <div class="login-wrap">
     <div class="login-logo">VELVET <i>&</i> VOID<sub>BISHKEK · EST. 2025</sub></div>
     <p class="eyebrow"><span class="eyebrow-line"></span>ПАНЕЛЬ УПРАВЛЕНИЯ</p>
-    <h2>Вход.</h2>
-    <p>Доступ только для команды V&V.</p>
+    <h2 id="loginTitle">Вход.</h2>
+    <p id="loginSubtitle">Доступ только для команды V&V.</p>
 
     <!-- Step 1: email + password -->
     <form id="loginForm" autocomplete="off">
@@ -319,35 +319,40 @@
       </div>
     </form>
 
-    <!-- Step 2: 2FA -->
-    <form id="twoFaForm" autocomplete="off" style="display:none">
-      <p style="font-size:11px;color:var(--muted);margin-bottom:20px;line-height:1.7">
-        Введите код из 6 цифр для подтверждения входа.<br>
-        <span style="font-size:9px;color:var(--soft)">Код: <strong id="twoFaHint" style="color:var(--gold)"></strong></span>
+    <!-- Step 2: "Забыли пароль?" — ввод email -->
+    <form id="forgotForm" autocomplete="off" style="display:none">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:20px;line-height:1.75">
+        Введите email вашего аккаунта — мы пришлём 6-значный код для входа.
       </p>
       <div class="form-group">
-        <label>Код подтверждения</label>
-        <input type="text" id="twoFaCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="000000" autocomplete="one-time-code" style="letter-spacing:.3em;font-size:22px;text-align:center">
+        <label>Email аккаунта</label>
+        <input type="email" id="forgotEmail" required autocomplete="new-password" placeholder="you@example.com">
       </div>
-      <button class="btn btn-full" type="submit"><span>Подтвердить</span><span>↗</span></button>
-      <p id="twoFaError" style="font-size:10px;color:var(--danger);margin-top:12px;text-align:center;min-height:16px"></p>
-      <div style="text-align:center;margin-top:14px;display:flex;justify-content:center;gap:20px">
-        <button type="button" id="backToLoginBtn" class="text-btn" style="font-size:10px">← Назад</button>
-        <button type="button" id="resendCodeBtn" class="text-btn" style="font-size:10px">Новый код <span id="resendTimer"></span></button>
+      <button class="btn btn-full" type="submit"><span>Отправить код</span><span>↗</span></button>
+      <p id="forgotError" style="font-size:10px;color:var(--danger);margin-top:12px;text-align:center;min-height:16px"></p>
+      <div style="text-align:center;margin-top:14px">
+        <button type="button" id="backFromForgotBtn" class="text-btn" style="font-size:10px">← Назад к входу</button>
       </div>
     </form>
 
-    <!-- Forgot password -->
-    <div id="forgotWrap" style="display:none">
-      <p style="font-size:12px;color:var(--text);margin-bottom:12px;font-family:'Playfair Display',serif">Сброс пароля.</p>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:18px;line-height:1.75">SMS-сервис не подключён к проекту. Для сброса пароля выполните команду в <strong style="color:var(--gold)">Render Shell</strong>:</p>
-      <div style="background:var(--surface-2);border:1px solid var(--line);padding:14px;font-size:10px;line-height:1.9;margin-bottom:18px;border-radius:4px">
-        Render → ваш сервис → <strong style="color:var(--gold)">Shell</strong><br>
-        <code style="color:var(--gold-bright)">python manage.py changepassword ваш@email.com</code>
+    <!-- Step 3: ввод кода из email -->
+    <form id="resetCodeForm" autocomplete="off" style="display:none">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.75">
+        Код отправлен на <strong id="resetEmailDisplay" style="color:var(--text)"></strong>
+      </p>
+      <p style="font-size:9px;color:var(--soft);margin-bottom:20px">Код действителен 10 минут.</p>
+      <div class="form-group">
+        <label>Код из письма</label>
+        <input type="text" id="resetCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="000000" autocomplete="one-time-code" style="letter-spacing:.3em;font-size:22px;text-align:center">
       </div>
-      <p style="font-size:9px;color:var(--soft);line-height:1.7;margin-bottom:16px">Чтобы подключить SMS — добавьте Twilio в бэкенд.</p>
-      <button type="button" id="backFromForgotBtn" class="text-btn" style="font-size:10px">← Назад к входу</button>
-    </div>
+      <button class="btn btn-full" type="submit"><span>Подтвердить</span><span>↗</span></button>
+      <p id="resetCodeError" style="font-size:10px;color:var(--danger);margin-top:12px;text-align:center;min-height:16px"></p>
+      <div style="text-align:center;margin-top:14px;display:flex;justify-content:center;gap:20px">
+        <button type="button" id="backFromCodeBtn" class="text-btn" style="font-size:10px">← Назад</button>
+        <button type="button" id="resendCodeBtn" class="text-btn" style="font-size:10px">Отправить снова <span id="resendTimer" style="color:var(--gold)"></span></button>
+      </div>
+    </form>
+
   </div>
 </div>
 
@@ -716,12 +721,12 @@
   let pendingSession = null;
   let twoFaCode = null;
   let resendTimer = null;
+  let forgotEmail = '';
 
   function showLogin() {
     document.getElementById('app').classList.remove('visible');
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('loadScreen').classList.add('done');
-    // Clear fields every time login screen shows
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
     document.getElementById('loginError').textContent = '';
@@ -729,13 +734,21 @@
   }
 
   function showLoginStep(step) {
-    document.getElementById('loginForm').style.display = step === 'form' ? '' : 'none';
-    document.getElementById('twoFaForm').style.display = step === '2fa' ? '' : 'none';
-    document.getElementById('forgotWrap').style.display = step === 'forgot' ? '' : 'none';
-    if (step === '2fa') {
-      document.getElementById('twoFaCode').value = '';
-      document.getElementById('twoFaError').textContent = '';
-      document.getElementById('twoFaCode').focus();
+    document.getElementById('loginForm').style.display      = step === 'form'      ? '' : 'none';
+    document.getElementById('forgotForm').style.display     = step === 'forgot'    ? '' : 'none';
+    document.getElementById('resetCodeForm').style.display  = step === 'code'      ? '' : 'none';
+    const titles = {
+      form:   ['Вход.',          'Доступ только для команды V&V.'],
+      forgot: ['Забыли пароль?', 'Введите email — пришлём код.'],
+      code:   ['Проверьте почту.','Введите 6-значный код из письма.'],
+    };
+    const [title, sub] = titles[step] || titles.form;
+    document.getElementById('loginTitle').textContent    = title;
+    document.getElementById('loginSubtitle').textContent = sub;
+    if (step === 'code') {
+      document.getElementById('resetCode').value = '';
+      document.getElementById('resetCodeError').textContent = '';
+      document.getElementById('resetCode').focus();
     }
   }
 
@@ -748,17 +761,84 @@
     loadAll();
   }
 
-  // Generate 6-digit code
-  function generateCode() {
-    return String(Math.floor(100000 + Math.random() * 900000));
-  }
-
-  // Start resend countdown (30s)
-  function startResendTimer() {
-    let secs = 30;
-    const btn = document.getElementById('resendCodeBtn');
-    const timerEl = document.getElementById('resendTimer');
+  // ── Login form ──
+  document.getElementById('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errEl    = document.getElementById('loginError');
+    errEl.textContent = '';
+    const btn = e.currentTarget.querySelector('button[type="submit"]');
     btn.disabled = true;
+    try {
+      const result = await api('auth/login', { method: 'POST', body: { email, password } }, false);
+      if (result.user?.role !== 'admin') { errEl.textContent = 'Нет прав администратора.'; btn.disabled = false; return; }
+      saveSession(result);
+      showApp();
+    } catch (err) {
+      errEl.textContent = err.message;
+      btn.disabled = false;
+    }
+  });
+
+  // ── Forgot: step 1 — enter email ──
+  document.getElementById('forgotBtn').addEventListener('click', () => showLoginStep('forgot'));
+  document.getElementById('backFromForgotBtn').addEventListener('click', () => showLoginStep('form'));
+
+  document.getElementById('forgotForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+    const errEl = document.getElementById('forgotError');
+    errEl.textContent = '';
+    const btn = e.currentTarget.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+      const res = await api('auth/forgot', { method: 'POST', body: { email } }, false);
+      forgotEmail = email;
+      // Dev mode: backend returns code directly when EMAIL not configured
+      if (res.dev_code) {
+        document.getElementById('resetEmailDisplay').textContent = email;
+        toast(`Режим разработки: код ${res.dev_code}`, 'success');
+      } else {
+        document.getElementById('resetEmailDisplay').textContent = email;
+        toast('Код отправлен на почту', 'success');
+      }
+      showLoginStep('code');
+      startResendTimer();
+    } catch (err) {
+      errEl.textContent = err.message;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ── Forgot: step 2 — enter code ──
+  document.getElementById('backFromCodeBtn').addEventListener('click', () => showLoginStep('forgot'));
+
+  document.getElementById('resetCodeForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const code  = document.getElementById('resetCode').value.trim();
+    const errEl = document.getElementById('resetCodeError');
+    errEl.textContent = '';
+    const btn = e.currentTarget.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+      const result = await api('auth/forgot/verify', { method: 'POST', body: { email: forgotEmail, code } }, false);
+      if (result.user?.role !== 'admin') { errEl.textContent = 'Нет прав администратора.'; btn.disabled = false; return; }
+      saveSession(result);
+      showApp();
+    } catch (err) {
+      errEl.textContent = err.message;
+      btn.disabled = false;
+    }
+  });
+
+  // ── Resend timer ──
+  function startResendTimer() {
+    let secs = 60;
+    const btn     = document.getElementById('resendCodeBtn');
+    const timerEl = document.getElementById('resendTimer');
+    btn.disabled  = true;
     clearInterval(resendTimer);
     resendTimer = setInterval(() => {
       secs--;
@@ -767,60 +847,17 @@
     }, 1000);
   }
 
-  document.getElementById('loginForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const errEl = document.getElementById('loginError');
-    errEl.textContent = '';
-    const btn = e.currentTarget.querySelector('button[type="submit"]');
-    btn.disabled = true;
+  document.getElementById('resendCodeBtn').addEventListener('click', async () => {
+    if (!forgotEmail) return;
     try {
-      const result = await api('auth/login', { method: 'POST', body: { email, password } }, false);
-      if (result.user?.role !== 'admin') { errEl.textContent = 'Нет прав администратора.'; btn.disabled = false; return; }
-      // Correct password → save session and go straight to app
-      saveSession(result);
-      showApp();
+      const res = await api('auth/forgot', { method: 'POST', body: { email: forgotEmail } }, false);
+      if (res.dev_code) toast(`Режим разработки: новый код ${res.dev_code}`, 'success');
+      else toast('Новый код отправлен', 'success');
+      startResendTimer();
     } catch (err) {
-      // Wrong password or other error → show error, no 2FA
-      errEl.textContent = err.message;
-      btn.disabled = false;
+      toast(err.message, 'error');
     }
   });
-
-  document.getElementById('twoFaForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const entered = document.getElementById('twoFaCode').value.trim();
-    const errEl = document.getElementById('twoFaError');
-    if (entered !== twoFaCode) {
-      errEl.textContent = 'Неверный код. Попробуйте снова.';
-      document.getElementById('twoFaCode').value = '';
-      document.getElementById('twoFaCode').focus();
-      return;
-    }
-    session = pendingSession;
-    saveSession(session);
-    pendingSession = null;
-    twoFaCode = null;
-    showApp();
-  });
-
-  document.getElementById('resendCodeBtn').addEventListener('click', () => {
-    twoFaCode = generateCode();
-    document.getElementById('twoFaHint').textContent = twoFaCode;
-    document.getElementById('twoFaCode').value = '';
-    document.getElementById('twoFaError').textContent = '';
-    startResendTimer();
-    toast('Новый код сгенерирован.');
-  });
-
-  document.getElementById('backToLoginBtn').addEventListener('click', () => {
-    pendingSession = null; twoFaCode = null;
-    showLoginStep('form');
-  });
-
-  document.getElementById('forgotBtn').addEventListener('click', () => showLoginStep('forgot'));
-  document.getElementById('backFromForgotBtn').addEventListener('click', () => showLoginStep('form'));
 
   document.getElementById('logoutBtn').addEventListener('click', logout);
 
