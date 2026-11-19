@@ -306,7 +306,7 @@
     <form id="loginForm" autocomplete="off">
       <div class="form-group">
         <label>Email</label>
-        <input type="email" id="loginEmail" required autocomplete="new-password" placeholder="you@example.com">
+        <input type="email" id="loginEmail" required autocomplete="new-password" placeholder="Email или номер телефона">
       </div>
       <div class="form-group">
         <label>Пароль</label>
@@ -340,12 +340,12 @@
     <!-- Forgot password -->
     <div id="forgotWrap" style="display:none">
       <p style="font-size:12px;color:var(--text);margin-bottom:12px;font-family:'Playfair Display',serif">Сброс пароля.</p>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:18px;line-height:1.75">Пароль сбрасывается через Render Shell — туда нет прямого доступа из браузера. Выполните команду:</p>
-      <div style="background:var(--surface-2);border:1px solid var(--line);padding:14px;font-size:10px;line-height:1.9;margin-bottom:18px">
-        1. Render → ваш сервис → <strong style="color:var(--gold)">Shell</strong><br>
-        2. Введите:<br>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:18px;line-height:1.75">SMS-сервис не подключён к проекту. Для сброса пароля выполните команду в <strong style="color:var(--gold)">Render Shell</strong>:</p>
+      <div style="background:var(--surface-2);border:1px solid var(--line);padding:14px;font-size:10px;line-height:1.9;margin-bottom:18px;border-radius:4px">
+        Render → ваш сервис → <strong style="color:var(--gold)">Shell</strong><br>
         <code style="color:var(--gold-bright)">python manage.py changepassword ваш@email.com</code>
       </div>
+      <p style="font-size:9px;color:var(--soft);line-height:1.7;margin-bottom:16px">Чтобы подключить SMS — добавьте Twilio в бэкенд.</p>
       <button type="button" id="backFromForgotBtn" class="text-btn" style="font-size:10px">← Назад к входу</button>
     </div>
   </div>
@@ -584,6 +584,44 @@
   let allVisits = [];
   let allProducts = [];
   let theme = localStorage.getItem('vv-theme-v1') || 'dark';
+  let lang = localStorage.getItem('vv-language-v1') || 'ru';
+
+  // ── i18n ──
+  const i18n = {
+    ru: { dashboard:'Dashboard', products:'Товары', orders:'Заказы', visits:'Записи в ателье',
+          openSite:'Открыть сайт', logout:'Выйти', adminPanel:'ПАНЕЛЬ УПРАВЛЕНИЯ',
+          productsMetric:'Товаров в каталоге', ordersMetric:'Заказов', revenueMetric:'Выручка',
+          lastOrders:'Последние заказы', upcomingVisits:'Ближайшие визиты',
+          catalog:'КАТАЛОГ', goodsTitle:'Товары.', addBtn:'+ Добавить', ordersTitle:'Заказы.',
+          ordersSection:'ЗАКАЗЫ', visitsTitle:'Записи.', atelierSection:'АТЕЛЬЕ',
+          visitsList:'Визиты в ателье', backToSite:'← Вернуться на сайт',
+          themeLight:'Светлая тема', themeDark:'Тёмная тема' },
+    en: { dashboard:'Dashboard', products:'Products', orders:'Orders', visits:'Atelier visits',
+          openSite:'Open site', logout:'Sign out', adminPanel:'ADMIN PANEL',
+          productsMetric:'Products in catalog', ordersMetric:'Orders', revenueMetric:'Revenue',
+          lastOrders:'Recent orders', upcomingVisits:'Upcoming visits',
+          catalog:'CATALOG', goodsTitle:'Products.', addBtn:'+ Add', ordersTitle:'Orders.',
+          ordersSection:'ORDERS', visitsTitle:'Visits.', atelierSection:'ATELIER',
+          visitsList:'Atelier appointments', backToSite:'← Back to site',
+          themeLight:'Light theme', themeDark:'Dark theme' },
+    kg: { dashboard:'Dashboard', products:'Буюмдар', orders:'Буйрутмалар', visits:'Ательеге жазылуулар',
+          openSite:'Сайтты ачуу', logout:'Чыгуу', adminPanel:'БАШКАРУУ ПАНЕЛИ',
+          productsMetric:'Каталогдогу буюмдар', ordersMetric:'Буйрутмалар', revenueMetric:'Киреше',
+          lastOrders:'Акыркы буйрутмалар', upcomingVisits:'Жакынкы визиттер',
+          catalog:'КАТАЛОГ', goodsTitle:'Буюмдар.', addBtn:'+ Кошуу', ordersTitle:'Буйрутмалар.',
+          ordersSection:'БУЙРУТМАЛАР', visitsTitle:'Жазылуулар.', atelierSection:'АТЕЛЬЕ',
+          visitsList:'Ательеге визиттер', backToSite:'← Сайтка кайтуу',
+          themeLight:'Жарык тема', themeDark:'Күңүрт тема' },
+    kz: { dashboard:'Dashboard', products:'Бұйымдар', orders:'Тапсырыстар', visits:'Ательеге жазылулар',
+          openSite:'Сайтты ашу', logout:'Шығу', adminPanel:'БАСҚАРУ ПАНЕЛІ',
+          productsMetric:'Каталогтағы бұйымдар', ordersMetric:'Тапсырыстар', revenueMetric:'Түсім',
+          lastOrders:'Соңғы тапсырыстар', upcomingVisits:'Жақындағы визиттер',
+          catalog:'КАТАЛОГ', goodsTitle:'Бұйымдар.', addBtn:'+ Қосу', ordersTitle:'Тапсырыстар.',
+          ordersSection:'ТАПСЫРЫСТАР', visitsTitle:'Жазылулар.', atelierSection:'АТЕЛЬЕ',
+          visitsList:'Ательеге визиттер', backToSite:'← Сайтқа оралу',
+          themeLight:'Жарық тема', themeDark:'Күңгірт тема' }
+  };
+  const t = key => (i18n[lang] || i18n.ru)[key] || (i18n.ru[key] || key);
 
   // ── Theme ──
   function applyTheme() {
@@ -596,6 +634,33 @@
     applyTheme();
   });
   applyTheme();
+
+  // ── Lang ──
+  function applyLang() {
+    // Sidebar nav
+    document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
+      const icons = { dashboard:'◈', products:'◌', orders:'♧', visits:'⌖' };
+      const key = btn.dataset.section;
+      btn.innerHTML = `<span class="nav-icon">${icons[key]}</span>${t(key)}`;
+    });
+    // Sidebar bottom
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.innerHTML = `✕ &nbsp;${t('logout')}`;
+    const openSiteLink = document.querySelector('.nav-item[href]');
+    if (openSiteLink) openSiteLink.innerHTML = `<span class="nav-icon">↗</span>${t('openSite')}`;
+    // Topbar back link
+    const backLink = document.querySelector('.back-link');
+    if (backLink) backLink.textContent = t('backToSite');
+    // Section headings
+    const setLabel = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    setLabel('topbarLabel', 'VELVET & VOID · ' + t('adminPanel'));
+  }
+
+  // Listen for theme/lang changes from main site (other tab)
+  window.addEventListener('storage', e => {
+    if (e.key === 'vv-theme-v1') { theme = e.newValue || 'dark'; applyTheme(); }
+    if (e.key === 'vv-language-v1') { lang = e.newValue || 'ru'; applyLang(); }
+  });
 
   // ── Helpers ──
   const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
@@ -679,6 +744,7 @@
     document.getElementById('app').classList.add('visible');
     document.getElementById('loadScreen').classList.add('done');
     document.getElementById('sidebarName').textContent = session?.user?.name || session?.user?.email || 'Админ';
+    applyLang();
     loadAll();
   }
 
@@ -707,17 +773,18 @@
     const password = document.getElementById('loginPassword').value;
     const errEl = document.getElementById('loginError');
     errEl.textContent = '';
+    const btn = e.currentTarget.querySelector('button[type="submit"]');
+    btn.disabled = true;
     try {
       const result = await api('auth/login', { method: 'POST', body: { email, password } }, false);
-      if (result.user?.role !== 'admin') { errEl.textContent = 'Нет прав администратора.'; return; }
-      // 2FA: generate code and show step 2
-      pendingSession = result;
-      twoFaCode = generateCode();
-      document.getElementById('twoFaHint').textContent = twoFaCode;
-      showLoginStep('2fa');
-      startResendTimer();
+      if (result.user?.role !== 'admin') { errEl.textContent = 'Нет прав администратора.'; btn.disabled = false; return; }
+      // Correct password → save session and go straight to app
+      saveSession(result);
+      showApp();
     } catch (err) {
+      // Wrong password or other error → show error, no 2FA
       errEl.textContent = err.message;
+      btn.disabled = false;
     }
   });
 
