@@ -768,25 +768,69 @@ def forgot_password(request):
     code = str(random.randint(100000, 999999))
     PasswordResetCode.objects.create(user=user, code=code)
 
-    email_configured = bool(getattr(settings, "EMAIL_HOST_USER", ""))
-    if email_configured:
+    brevo_api_key = getattr(settings, "BREVO_API_KEY", "").strip()
+    email_configured = bool(getattr(settings, "EMAIL_HOST_USER", "")) or bool(brevo_api_key)
+    if brevo_api_key:
         try:
-            send_mail(
-                subject="VELVET & VOID — код для входа",
-                message=(
+            payload = {
+                "sender": {
+                    "email": settings.DEFAULT_FROM_EMAIL,
+                    "name": "VELVET & VOID",
+                },
+                "to": [{"email": user.email}],
+                "subject": "VELVET & VOID — код для входа",
+                "textContent": (
                     f"Ваш код подтверждения: {code}\n\n"
                     "Код действителен 10 минут.\n"
                     "Если вы не запрашивали вход — проигнорируйте это письмо."
                 ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
+            }
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                "https://api.brevo.com/v3/smtp/email",
+                data=data,
+                headers={
+                    "Content-Type": "application/json",
+                    "api-key": brevo_api_key,
+                    "accept": "application/json",
+                },
+                method="POST",
             )
+            with urllib.request.urlopen(req, timeout=settings.EMAIL_TIMEOUT) as response:
+                body = response.read().decode("utf-8")
+                if response.status not in (200, 201):
+                    logger.warning(
+                        "Brevo API rejected the message: HTTP %s %s",
+                        response.status,
+                        body[:300],
+                    )
+                    return api_error("Не удалось отправить письмо. Попробуйте позже.")
+        except Exception as exc:
+            logger.exception("Failed to send password reset email via Brevo.")
+            return api_error("Не удалось отправить письмо. Попробуйте позже.")
+    elif email_configured:
+        try:
+            prev_timeout = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(settings.EMAIL_TIMEOUT)
+            try:
+                send_mail(
+                    subject="VELVET & VOID — код для входа",
+                    message=(
+                        f"Ваш код подтверждения: {code}\n\n"
+                        "Код действителен 10 минут.\n"
+                        "Если вы не запрашивали вход — проигнорируйте это письмо."
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=False,
+                )
+            finally:
+                socket.setdefaulttimeout(prev_timeout)
         except Exception as exc:
             logger.exception("Failed to send password reset email.")
-            return api_error(f"Не удалось отправить письмо: {exc}")
+            return api_error("Не удалось отправить письмо. Попробуйте позже.")
     else:
-        # Dev mode: return code in response so it can be tested without SMTP
+        # Dev mode: return code in response so it can be tested without SMTP/API
         return Response({"sent": True, "dev_code": code})
 
     return Response({"sent": True})

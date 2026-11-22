@@ -38,7 +38,6 @@
 
   const STORAGE={products:"vv-products-v1",cart:"vv-cart-v1",wishlist:"vv-wishlist-v1",theme:"vv-theme-v1",language:"vv-language-v1",user:"vv-user-v1",users:"vv-users-v1",orders:"vv-orders-v1",reviews:"vv-reviews-v1",subscribers:"vv-subscribers-v1",visits:"vv-visits-v1"};
   const backendMode=location.protocol!=="file:"&&!new URLSearchParams(location.search).has("demo");
-  const API_BASE_URL=String(window.VV_CONFIG?.apiBaseUrl||"").replace(/\/+$/,"");
   const runtime={configured:false,oauthProviders:[],cloudinaryCloudName:"",cloudinaryUploadPreset:"",telegramConfigured:false,session:null,page:1,pages:1,apiReviews:[]};
   const read=(key,fallback)=>{try{const value=localStorage.getItem(key);return value===null?fallback:JSON.parse(value);}catch{return fallback;}};
   const save=(key,value)=>localStorage.setItem(key,JSON.stringify(value));
@@ -53,7 +52,7 @@
     const requestHeaders={...headers};
     if(runtime.session?.accessToken&&!requestHeaders.Authorization)requestHeaders.Authorization=`Bearer ${runtime.session.accessToken}`;
     if(body!==undefined)requestHeaders["Content-Type"]="application/json";
-    const response=await fetch(`${API_BASE_URL}/api/${path}`,{method,headers:requestHeaders,body:body===undefined?undefined:JSON.stringify(body)});
+    const response=await fetch(`/api/${path}`,{method,headers:requestHeaders,body:body===undefined?undefined:JSON.stringify(body)});
     const payload=await response.json().catch(()=>({}));
     if(response.status===401&&retry&&runtime.session?.refreshToken&&path!=="auth/refresh"){
       try{
